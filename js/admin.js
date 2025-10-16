@@ -1,65 +1,83 @@
 let carrito = [];
 
-// Cargar carrito desde localStorage
+// 🟩 Cargar carrito desde localStorage
 if (localStorage.getItem('carrito')) {
   carrito = JSON.parse(localStorage.getItem('carrito'));
   actualizarCarrito();
 }
 
-// Lista de productos (ejemplo)
+
+
+
+
+// 🟦 Lista de productos (ejemplo)
 const productos = [
   { id: 1, nombre: "Gorra Nike pro", precios: { "Única": 800 }, imagen: "img/card1.png" },
   { id: 2, nombre: "Gorra Adidas", precios: { "Única": 750 }, imagen: "img/card2.png" },
   { id: 3, nombre: "Gorra Puma", precios: { "Única": 600 }, imagen: "img/card3.png" },
   { id: 4, nombre: "Gorra Jordan", precios: { "Única": 900 }, imagen: "img/card4.png" },
-  { id: 1, nombre: "Gorra Nike pro", precios: { "Única": 800 }, imagen: "img/card5.png" },
-  { id: 2, nombre: "Gorra Adidas", precios: { "Única": 750 }, imagen: "img/card6.png" },
-  { id: 3, nombre: "Gorra Puma", precios: { "Única": 600 }, imagen: "img/card1.png" },
-  { id: 4, nombre: "Gorra Jordan", precios: { "Única": 900 }, imagen: "img/card2.png" },
+  { id: 5, nombre: "Gorra Supreme", precios: { "Única": 950 }, imagen: "img/card5.png" },
+  { id: 6, nombre: "Gorra S Vans", precios: { "Única": 700 }, imagen: "img/card6.png" },
+  { id: 7, nombre: "Gorra Reebok", precios: { "Única": 650 }, imagen: "img/card1.png" },
+  { id: 8, nombre: "Gorra Under A", precios: { "Única": 880 }, imagen: "img/card2.png" },
 ];
 
-const contenedor = document.getElementById("productos-container");
+// 🟠 IDs de productos seleccionados para la sección "Para hoy"
+const seleccionadosParaHoy = [1, 4, 6]; // Puedes cambiar estos IDs a los que tú quieras
 
-// Renderizar cards de productos
-productos.forEach(producto => {
-  const col = document.createElement("div");
-  col.className = "col s6 m4";
-  col.setAttribute("data-aos", "fade-up");
-  
-  // Precio principal: el más alto
-  const preciosArray = Object.values(producto.precios);
-  const precioMayor = Math.max(...preciosArray);
 
-  col.innerHTML = `
-    <div class="card hoverable" style="border-radius:10px;">
-      <div class="card-image">
-        <img src="${producto.imagen}" style="height:auto; border-radius:10px; object-fit:cover;">
-      </div>
-      <div class="card-content center-align">
-        <span class="card-title">${producto.nombre}</span>
-        <p>
-          L.${precioMayor}
-        </p>
-      </div>
-      <div class="card-action center teal darken-1" style="border-radius:10px;">
-        <a href="#!" class="white-text" onclick="agregarDirecto(${producto.id})">Agregar al carrito</a>
-      </div>
-    </div>`;
-  contenedor.appendChild(col);
-});
 
-// 🔸 Agregar directo al carrito
+
+
+// 🟪 Renderizar cards de productos
+function renderizarProductos(lista, contenedorId) {
+  const contenedor = document.getElementById(contenedorId);
+  contenedor.innerHTML = ""; // Limpia antes de renderizar
+
+  lista.forEach(producto => {
+    const col = document.createElement("div");
+    col.className = "col s6 m4";
+    col.setAttribute("data-aos", "fade-up");
+
+    const preciosArray = Object.values(producto.precios);
+    const precioMayor = Math.max(...preciosArray);
+
+    col.innerHTML = `
+      <div class="card hoverable" style="border-radius:10px;">
+        <div class="card-image">
+          <img src="${producto.imagen}" style="height:auto; border-radius:10px; object-fit:cover;">
+        </div>
+        <div class="card-content center-align">
+          <span class="card-title">${producto.nombre}</span>
+          <p>L.${precioMayor}</p>
+        </div>
+        <div class="card-action center teal darken-1" style="border-radius:10px;">
+          <a href="#!" class="white-text" onclick="agregarDirecto(${producto.id})">Agregar al carrito</a>
+        </div>
+      </div>`;
+    contenedor.appendChild(col);
+  });
+}
+
+// 🟨 Renderizar sección “Todos los productos”
+renderizarProductos(productos, "productos-container");
+
+// 🟧 Renderizar sección “Para hoy” (solo 3 seleccionados)
+const productosParaHoy = productos.filter(p => seleccionadosParaHoy.includes(p.id));
+renderizarProductos(productosParaHoy, "para-hoy-container");
+
+
+
+// 🟩 Agregar directo al carrito
 function agregarDirecto(id) {
   const producto = productos.find(p => p.id === id);
   if (!producto) return;
 
-  // Si hay varias presentaciones, tomamos la primera por defecto
   const presentaciones = Object.keys(producto.precios);
   const presentacion = presentaciones[0];
   const precioSeleccionado = producto.precios[presentacion];
   const cantidad = 1;
 
-  // Ver si ya existe en el carrito
   const existente = carrito.find(item => item.id === producto.id && item.presentacion === presentacion);
   if (existente) {
     existente.cantidad += cantidad;
@@ -89,7 +107,7 @@ function agregarDirecto(id) {
   });
 }
 
-// 🔸 Actualizar carrito
+// 🟦 Actualizar carrito
 function actualizarCarrito() {
   const cont = document.getElementById("carrito-items");
   cont.innerHTML = "";
@@ -136,17 +154,18 @@ function actualizarCarrito() {
       </div>`;
   });
 
-  document.getElementById("cartTotal").innerHTML = `<div style="margin-top:10px; padding:10px; text-align:right; font-size:16px; font-weight:bold; color:#222;">Total: L.${total}</div>`;
+  document.getElementById("cartTotal").innerHTML =
+    `<div style="margin-top:10px; padding:10px; text-align:right; font-size:16px; font-weight:bold; color:#222;">Total: L.${total}</div>`;
   localStorage.setItem('carrito', JSON.stringify(carrito));
 }
 
-// Eliminar item
+// 🟥 Eliminar item
 function eliminarDelCarrito(i) {
   carrito.splice(i, 1);
   actualizarCarrito();
 }
 
-// Modal Carrito
+// 🟧 Modal Carrito
 function abrirCarrito() {
   document.getElementById("cartModal").style.display = "block";
 }
@@ -154,10 +173,18 @@ function cerrarCarrito() {
   document.getElementById("cartModal").style.display = "none";
 }
 
-// Cotizar por WhatsApp
+// 🟩 Cotizar por WhatsApp
 function cotizarWhatsApp() {
   if (carrito.length === 0) {
-    Swal.fire({icon:'info',title:'Carrito vacío',text:'Agrega productos antes de cotizar',timer:1500,showConfirmButton:false,toast:true,position:'top-end'});
+    Swal.fire({
+      icon:'info',
+      title:'Carrito vacío',
+      text:'Agrega productos antes de cotizar',
+      timer:1500,
+      showConfirmButton:false,
+      toast:true,
+      position:'top-end'
+    });
     return;
   }
 
@@ -170,7 +197,7 @@ function cotizarWhatsApp() {
   window.open(`https://wa.me/50498174113?text=${mensaje}`, "_blank");
 }
 
-// Inicializar Materialize y AOS
+// 🟨 Inicializar Materialize y AOS
 document.addEventListener('DOMContentLoaded', function () {
   M.Sidenav.init(document.querySelectorAll('.sidenav'));
   M.Modal.init(document.querySelectorAll('.modal'));
